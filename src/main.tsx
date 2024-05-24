@@ -10,7 +10,7 @@ async function enableMocking() {
   return worker.start();
 }
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     // <React.StrictMode> // Eliminado para evitar doble montado del componente en desarrollo para explicar mejor las peticiones antes de react query.

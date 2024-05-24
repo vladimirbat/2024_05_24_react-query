@@ -1,13 +1,14 @@
 import { Task } from "../../domain/model/Task";
+import { useTasksList } from "../../queries/useTasksList";
 import sytles from "./TasksTable.module.css";
 
 export interface TasksTableProps {
-  tasks: Task[];
   toggleTask: (task: Task) => void;
 }
 
 
-export function TasksTable({ tasks, toggleTask }: TasksTableProps) {
+export function TasksTable({ toggleTask }: TasksTableProps) {
+  const { data: tasks } = useTasksList()
 
   return <table className={sytles.tasksTable}>
     <thead>
@@ -19,7 +20,7 @@ export function TasksTable({ tasks, toggleTask }: TasksTableProps) {
       </tr>
     </thead>
     <tbody>
-      {tasks.map(task => {
+      {tasks?.map(task => {
         return <tr key={task.id}>
           <td>{task.id}</td>
           <td data-task-status={task.status}><span>{task.status}</span></td>

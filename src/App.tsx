@@ -1,31 +1,36 @@
-import { useEffect, useState } from 'react';
-import styles from './App.module.css'
-import { fetchTaks, postNewTask, sendUpdateTaskStatus } from './infraestructure/TaksRepository';
-import { TasksTable } from './components/tasks-table/TasksTable';
+import styles from './App.module.css';
 import { NewTask } from './components/new-task/NewTask';
-import { Task } from './domain/model/Task';
 import { Summary } from './components/summary/Summary';
+import { TasksTable } from './components/tasks-table/TasksTable';
+import { Task } from './domain/model/Task';
+import { postNewTask, sendUpdateTaskStatus } from './infraestructure/TaksRepository';
+import { useTasksList } from './queries/useTasksList';
+import { useToggleTaskMutation } from './queries/useToggleTaskMutation';
 
 function App() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  useEffect(() => {
-    fetchTaks().then((data) => setTasks(data));
-  }, []);
 
-  const handleNewTask = (task: Task) => {
-    postNewTask(task);
-  }
+  const { data: tasks, isError, isSuccess } = useTasksList()
+  const { mutate } = useToggleTaskMutation();
+
   const handleToggleTask = (task: Task) => {
     const updatedTask: Task = { ...task, status: task.status === 'DONE' ? 'TO-DO' : 'DONE' }
-    sendUpdateTaskStatus(updatedTask);
+    mutate(updatedTask);
+  }
+
+  // if (!tasks || tasks.length == 0) {
+  if (!isSuccess) {
+    return null;
+  }
+  if (isError) {
+    return <div>Ops!!! Error</div>;
   }
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Tasks List</h1>
-      {tasks.length ? <TasksTable tasks={tasks} toggleTask={handleToggleTask} /> : null}
-      <NewTask newTaskEvent={handleNewTask} />
-      <Summary list={tasks} />
+      <TasksTable toggleTask={handleToggleTask} />
+      <NewTask />
+      <Summary />
     </div>);
 }
 
